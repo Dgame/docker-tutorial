@@ -1,0 +1,12 @@
+version: "3.7"
+
+services:
+  php-localhost:
+    container_name: php-localhost
+    build:
+      dockerfile: ./.docker/php/Dockerfile
+      context: .
+    volumes:
+      - .:/var/www/html/:ro
+    ports:
+      - "8080:9000"
