@@ -247,7 +247,7 @@ services:
  - `restart: "no"`: Default. Container wird unter keinen Umständen neugestartet
  - `restart: always`: Wann immer der Container beendet wird (z.B. durch einen Fehler oder weile eine Verbindung abbricht)
  - `restart: on-failure`: Nur wenn der Container durch einen Fehler beendet wurde
- - `restart: unless-stopped`: Solange bis der Cóntainer erfolgreich beendet wird (z.B. manuell)
+ - `restart: unless-stopped`: Solange bis der Container erfolgreich beendet wird (z.B. manuell)
 
 **Quelle**
 [https://docs.docker.com/](https://docs.docker.com/compose/)
@@ -274,7 +274,7 @@ services:
 
 ## Volumes
 
-Jeder Container geht bei jedem Start von der Image-Definition aus. Container können Dateien erstellen, aktualisieren und löschen, allerdings gehen diese Änderungen verloren, wenn der Container entfernt wird. Um das zu verhiondern, benötigen wir _Volumes_.
+Jeder Container geht bei jedem Start von der Image-Definition aus. Container können Dateien erstellen, aktualisieren und löschen, allerdings gehen diese Änderungen verloren, wenn der Container entfernt wird. Um das zu verhindern, benötigen wir _Volumes_.
 
 Volumes bieten die Möglichkeit, bestimmte Dateisystempfade des Containers mit dem Host-Rechner zu verbinden. Wenn ein Verzeichnis im Container _gemountet_ wird, werden Änderungen in diesem Verzeichnis auch auf dem Host-Rechner gesynct.
 
@@ -615,7 +615,7 @@ Was dann per `make build` ausgeführt werden kann.
 
 # Makefile: Warum kein Shell-Script?
 
- - Shell Scripte sind nicht unbedingt kompatibel zwischen  unterschiedlichen Shells (`sh`, `dash`, `bash`, `fish`, `zsh`, etc.)
+ - Shell Scripte sind nicht unbedingt kompatibel zwischen unterschiedlichen Shells (`sh`, `dash`, `bash`, `fish`, `zsh`, etc.)
  - Die Syntax ist komplexer
  - `make` ist auf jedem Linux-artigen Betriebssystem (und oft auch bei Windows) vorinstalliert
 
