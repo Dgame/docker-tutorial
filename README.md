@@ -25,7 +25,7 @@ Docker dient zur Isolierung von Anwendungen mit Hilfe von sogenannter _Container
 ---
 
 ### Image
-Ein Speicherabbild eines Containers. Das Image selbst besteht aus mehreren _Layern_, die schreibgeschützt sind und somit nicht verändert werden können. Ein _Image_ ist portabel, kann in Repositories gespeichert und mit anderen Nutzern geteilt werden. Aus einem _Image_ können immer mehrere _Container_ gestartet werden.
+Ein Speicherabbild eines Containers. Das _Image_ selbst besteht aus mehreren _Layern_, die schreibgeschützt sind und somit nicht verändert werden können. Ein _Image_ ist portabel, kann in Repositories gespeichert und mit anderen Nutzern geteilt werden. Aus einem _Image_ können immer mehrere _Container_ gestartet werden.
 
 **Quelle**
 [Wikipedia: Docker](https://de.wikipedia.org/wiki/Docker_(Software))
@@ -33,7 +33,7 @@ Ein Speicherabbild eines Containers. Das Image selbst besteht aus mehreren _Laye
 ---
 
 ### Container
-Als _Container_ wird die aktive Instanz eines _Image_s bezeichnet. Der Container wird also gerade ausgeführt und ist beschäftigt. Sobald der _Container_ kein Programm ausführt oder mit seinem Auftrag fertig ist, wird der _Container_ automatisch beendet.
+Als _Container_ wird die aktive Instanz eines _Images_ bezeichnet. Der Container wird also gerade ausgeführt und ist beschäftigt. Sobald der _Container_ kein Programm ausführt oder mit seinem Auftrag fertig ist, wird der _Container_ automatisch beendet.
 
 **Quelle**
 [Wikipedia: Docker](https://de.wikipedia.org/wiki/Docker_(Software))
@@ -41,7 +41,7 @@ Als _Container_ wird die aktive Instanz eines _Image_s bezeichnet. Der Container
 ---
 
 ### Layer
-Ein _Layer_ ist Teil eines _Image_s und enthält einen Befehl oder eine Datei, die dem _Image_ hinzugefügt wurde. Anhand der _Layer_ kann die ganze Historie des _Image_s nachvollzogen werden.
+Ein _Layer_ ist Teil eines _Images_ und enthält einen Befehl oder eine Datei, die dem _Image_ hinzugefügt wurde. Anhand der _Layer_ kann die ganze Historie des _Images_ nachvollzogen werden.
 
 **Quelle**
 [Wikipedia: Docker](https://de.wikipedia.org/wiki/Docker_(Software))
@@ -76,7 +76,7 @@ Die Verwendung von _docker-compose_ ist ein dreistufiger Prozess:
 
  1. Definierung der Anwendung in einem _Dockerfile_
  2. Anschließend werden in der Datei `docker-compose.yml` die Dienste, aus denen die Applikation besteht (auch _Services_ genannt), definiert
- 3. `docker compose up` baut (sofern nötig) und startet alle definierten _Services_
+ 3. `docker-compose up` baut (sofern nötig) und startet alle definierten _Services_
 
 **Quelle**
 [https://docs.docker.com/](https://docs.docker.com/compose/)
@@ -233,9 +233,9 @@ services:
 
 ## Dependency
 
- - `docker-compose up` startet die definierten Services in der Reihenfolge der Abhängigkeiten. Im Beispiel: `db` > `redis` > `web`
- - `docker-compose up <service>` schließt automatisch die Abhängigkeiten von `<service>` ein. Daher **startet** `docker-compose up web` auch `db` und `redis`.
- - `docker-compose stop` **stoppt** Services in der Reihenfolge der Abhängigkeiten. Daher wird `web` vor `db` und `redis` gestoppt.
+ - `docker-compose up` startet die definierten Services in der Reihenfolge der Abhängigkeiten. Im Beispiel: `db` > `redis` > `php`
+ - `docker-compose up <service>` schließt automatisch die Abhängigkeiten von `<service>` ein. Daher **startet** `docker-compose up php` auch `db` und `redis`.
+ - `docker-compose stop` **stoppt** Services in der Reihenfolge der Abhängigkeiten. Daher wird `php` vor `db` und `redis` gestoppt.
 
 **Quelle**
 [https://docs.docker.com/](https://docs.docker.com/compose/)
@@ -263,8 +263,6 @@ services:
   php:
     container_name: php
     image: php:8.0-fpm-alpine
-    volumes:
-      - .:/var/www/html/
   db:
     image: postgres
     restart: always
