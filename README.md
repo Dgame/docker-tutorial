@@ -342,7 +342,7 @@ services:
 
 ## Context
 
-Durch den Verweist `dockerfile: ./.docker/php/Dockerfile` wird als _context_ `./.docker/php/` verwendet. Das heißt, dass das kopieren von Dateien von `./.docker/php/` ausgeht. Um einen anderen Ordner als Context zu verwenden, kann die Option `context <folder>` benutzt werden. Um z.B. im derzeitigen Ordner zu bleiben, wird `context: .` definiert.
+Durch den Verweis `dockerfile: ./.docker/php/Dockerfile` wird als _context_ `./.docker/php/` verwendet. Das heißt, dass das kopieren von Dateien von `./.docker/php/` ausgeht. Um einen anderen Ordner als Context zu verwenden, kann die Option `context <folder>` benutzt werden. Um z.B. im derzeitigen Ordner zu bleiben, wird `context: .` definiert.
 
 ---
 
@@ -480,7 +480,7 @@ Als nächstes: **Best practise** & **Multi-Staged**
 
 # Best practise
 
-Eine der größten Herausforderungen beim Erstellen von Images ist es, die Größe des Images gering zu halten. Jede Anweisung im Dockerfile fügt dem Image eine Schicht hinzu.
+Eine der größten Herausforderungen beim Erstellen von Images ist es, die Größe des Images gering zu halten. Jede Anweisung im Dockerfile fügt dem Image eine Schicht hinzu (die sogenannten _Layer_).
 
 ---
 
