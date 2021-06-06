@@ -932,6 +932,7 @@ docker-compose -f localstack/docker-compose.yml up -d
 
 Relevant für Production aber irrelevant für local(stack):
  - In `localstack` wird Elasticsearch Service durch ein internes Elasticsearch Cluster mit einem Node abgebildet
+    - ⇒ [Localstack - Externe Services](#localstack---externe-services)
 
 ---
 
