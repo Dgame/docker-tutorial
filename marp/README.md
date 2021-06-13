@@ -417,9 +417,18 @@ Quelle: [Docker Networks](https://docs.docker.com/compose/networking/)
 
 ```yml
 networks:
-  default:
-    external: true
+  frontend:
     name: frontend
+    external: true
+```
+
+**vs**
+
+```yml
+networks:
+  frontend:
+    name: frontend
+    driver: bridge
 ```
 
 ---
@@ -753,6 +762,18 @@ Als nächstes: **Localstack**
 
 # Localstack
 
+> LocalStack provides an easy-to-use test/mocking framework for developing Cloud applications. It spins up a testing environment **on your local machine** that provides the same functionality and APIs as the real AWS cloud environment.
+[...]
+Your application is developed entirely on the local developer machines. LocalStack provisions all required "cloud" resources in a local container.
+[...]
+Once all tests are green, you flip the switch and the application can be seamlessly deployed to the real AWS cloud environment.
+
+[Quelle](https://localstack.cloud/)
+
+---
+
+# Localstack
+
 ```yml
 version: "3.7"
 
@@ -761,11 +782,11 @@ services:
     container_name: localstack_main
     image: localstack/localstack:latest
     ports:
-      - "${LOCALSTACK_EDGE_PORT-4566}:4566"
+      - 4566:4566"
     environment:
       - DEBUG=1
       - DATA_DIR=.localstack/data
-      - SERVICES=${LOCALSTACK_SERVICES}
+      - SERVICES=es,firehose
     volumes:
       - ".localstack:/tmp/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -775,16 +796,292 @@ services:
 
 # Localstack
 
- - `LOCALSTACK_EDGE_PORT`:
-  Der Port auf dem Localstack auf `localhost` läuft. Default ist `4566`.
- - `DEBUG`
+ - `DEBUG` ⇒ `int` (1 ⇒ true, 0 ⇒ false)
   Um Fehler beim starten von Localstack oder deren Services besser zu identifizieren
- - `DATA_DIR`
+ - `DATA_DIR` ⇒ `string`
   Lokales Verzeichnis zum Speichern persistenter Daten
- - `SERVICES`
+ - `SERVICES` ⇒ `string`
   Komma-separierte Liste der AWS-Services, die gestartet werden sollen. Die Servicenamen entsprechen im Wesentlichen den Servicenamen der `aws-cli` (`kinesis`, `lambda`, `sqs`, `es`, etc.)
 
 Quelle: [localstack](https://github.com/localstack/localstack)
+
+---
+
+# aws-cli installieren
+
+>$ aws --version
+
+>aws-cli/2...
+
+---
+
+# aws-cli installieren: Linux / WSL
+
+ - `curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"`
+ - `unzip awscliv2.zip`
+ - `sudo ./aws/install`
+
+---
+
+# aws-cli installieren: Windows
+
+ - https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-windows.html
+
+---
+
+# aws-cli installieren: Mac
+
+ - https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-mac.html
+
+---
+
+# aws-cli ausführen
+
+## Service ausführen:
+> aws <service> <action> [options]
+
+## Lokale Ausführung:
+> aws **--endpoint-url=http://localhost:4566** <service> <action> [options]
+
+---
+
+# Localstack - Beispiel
+
+[![](https://mermaid.ink/img/eyJjb2RlIjoiZ3JhcGggVERcbiAgQVtFeHRlcm5lIFN5c3RlbWVdLS0-fElucHV0fCBCW0FQSV1cbiAgQi0uLT5DMShGaXJlaG9zZSBTdHJlYW1zKSAmIEMyKEZpcmVob3NlIFN0cmVhbXMpICYgQzMoRmlyZWhvc2UgU3RyZWFtcylcbiAgQzEtLi0-RChFbGFzdGljc2VhcmNoIFNlcnZpY2UpXG4gIEMyLS4tPkRcbiAgQzMtLi0-RFxuXHRcdCIsIm1lcm1haWQiOnsidGhlbWUiOiJkZWZhdWx0In0sInVwZGF0ZUVkaXRvciI6ZmFsc2UsImF1dG9TeW5jIjp0cnVlLCJ1cGRhdGVEaWFncmFtIjpmYWxzZX0)](https://mermaid-js.github.io/mermaid-live-editor/edit##eyJjb2RlIjoiZ3JhcGggTFJcbiAgQVtFeHRlcm5lIFN5c3RlbWVdLS0-fElucHV0fCBCW0FQSV1cbiAgQi0uLT5DMShGaXJlaG9zZSBTdHJlYW1zKSAmIEMyKEZpcmVob3NlIFN0cmVhbXMpICYgQzMoRmlyZWhvc2UgU3RyZWFtcylcbiAgQzEtLi0-RChFbGFzdGljc2VhcmNoIFNlcnZpY2UpXG4gIEMyLS4tPkRcbiAgQzMtLi0-RFxuXHRcdCIsIm1lcm1haWQiOiJ7XG4gIFwidGhlbWVcIjogXCJkZWZhdWx0XCJcbn0iLCJ1cGRhdGVFZGl0b3IiOmZhbHNlLCJhdXRvU3luYyI6dHJ1ZSwidXBkYXRlRGlhZ3JhbSI6ZmFsc2V9)
+
+---
+
+# Localstack - Beispiel
+
+```sh
+docker-compose -f localstack/docker-compose.yml up -d
+```
+
+---
+
+# Localstack - Elasticsearch Service
+
+> aws --endpoint-url=http://localhost:4566 es create-elasticsearch-domain --domain-name es_local
+
+ - Service: `es`
+ - Action: `create-elasticsearch-domain`
+ - Options:
+    - `--domain-name` ⇒ `es_local`
+
+---
+
+# Localstack - Elasticsearch Service
+
+## Relevant für Production:
+ - `--elasticsearch-version <value>`
+ - `--elasticsearch-cluster-config <value>`
+
+[aws-cli Dokumentation](https://docs.aws.amazon.com/cli/latest/reference/es/create-elasticsearch-domain.html)
+
+---
+
+# Localstack - Elasticsearch Service
+
+ - 7.10, 7.9, 7.8, 7.7, 7.4, 7.1
+ - 6.8, 6.7, 6.5, 6.4, 6.3, 6.2, 6.0
+ - 5.6, 5.5, 5.3, 5.1
+ - 2.3
+ - 1.5
+
+[Dokumentation](https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/what-is-amazon-elasticsearch-service.html#aes-choosing-version)
+
+---
+
+# Localstack - Elasticsearch Service
+
+ - `InstanceType` ⇒ `m3.medium.elasticsearch`
+ - `InstanceCount`
+ - `DedicatedMasterEnabled`
+ - `DedicatedMasterType` ⇒ `m3.large.elasticsearch`
+ - `DedicatedMasterCount`
+
+---
+
+# Localstack - Elasticsearch Service
+
+ - **Relevant** für Production &xhArr; **Irrelevant** für local(stack)
+
+---
+
+# Localstack - Elasticsearch Service
+
+ - **Relevant** für Production &xhArr; **Irrelevant** für local(stack)
+    - In `localstack` wird Elasticsearch Service durch ein **internes** Elasticsearch Cluster mit **einem Node** abgebildet
+  ⇒ [Localstack - Externe Services](#localstack---externe-services)
+
+---
+
+# ARN
+
+**A**mazon **R**esource **N**ames
+
+## Format
+
+- `arn:partition:service:region:account-id:resource-id`
+- `arn:partition:service:region:account-id:resource-type/resource-id`
+- `arn:partition:service:region:account-id:resource-type:resource-id`
+
+[Dokumentation](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
+
+---
+
+# aws-cli: ARN
+
+ - Response der `create-elasticsearch-domain` Action
+ - `aws es describe-elasticsearch-domain ---domain-name es_local`
+
+**Output**:
+```json
+{
+  ...
+  "ARN": arn:aws:es:us-east-1:000000000000:domain/es_local`,
+  ...
+}
+```
+
+---
+
+# Fragen? Kurze Pause?
+
+Als nächstes: **Localstack - Firehose**
+
+---
+
+# Localstack - Firehose
+
+[![](https://mermaid.ink/img/eyJjb2RlIjoiZ3JhcGggVERcbiAgQVtFeHRlcm5lIFN5c3RlbWVdLS0-fElucHV0fCBCW0FQSV1cbiAgQi0uLT5DMShGaXJlaG9zZSBTdHJlYW1zKSAmIEMyKEZpcmVob3NlIFN0cmVhbXMpICYgQzMoRmlyZWhvc2UgU3RyZWFtcylcbiAgQzEtLi0-RChFbGFzdGljc2VhcmNoIFNlcnZpY2UpXG4gIEMyLS4tPkRcbiAgQzMtLi0-RFxuICBzdHlsZSBDMSBmaWxsOiNmOTYsY29sb3I6I2ZmZlxuICBzdHlsZSBDMiBmaWxsOiNmOTYsY29sb3I6I2ZmZlxuICBzdHlsZSBDMyBmaWxsOiNmOTYsY29sb3I6I2ZmZlxuICBsaW5rU3R5bGUgNCBzdHJva2U6I2Y5NlxuICBsaW5rU3R5bGUgNSBzdHJva2U6I2Y5NlxuICBsaW5rU3R5bGUgNiBzdHJva2U6I2Y5NiIsIm1lcm1haWQiOnsidGhlbWUiOiJkZWZhdWx0In0sInVwZGF0ZUVkaXRvciI6ZmFsc2UsImF1dG9TeW5jIjp0cnVlLCJ1cGRhdGVEaWFncmFtIjpmYWxzZX0)](https://mermaid-js.github.io/mermaid-live-editor/edit##eyJjb2RlIjoiZ3JhcGggVERcbiAgQVtDaHJpc3RtYXNdIC0tPnxHZXQgbW9uZXl8IEIoR28gc2hvcHBpbmcpXG4gIEIgLS0-IEN7TGV0IG1lIHRoaW5rfVxuICBDIC0tPnxPbmV8IERbTGFwdG9wXVxuICBDIC0tPnxUd298IEVbaVBob25lXVxuICBDIC0tPnxUaHJlZXwgRltmYTpmYS1jYXIgQ2FyXVxuXHRcdCIsIm1lcm1haWQiOiJ7XG4gIFwidGhlbWVcIjogXCJkZWZhdWx0XCJcbn0iLCJ1cGRhdGVFZGl0b3IiOmZhbHNlLCJhdXRvU3luYyI6dHJ1ZSwidXBkYXRlRGlhZ3JhbSI6ZmFsc2V9)
+
+---
+
+# Localstack - Firehose: Create Stream
+
+> aws --endpoint-url=http://localhost:4566 **firehose** ...
+
+ - Service: `firehose`
+
+---
+
+# Localstack - Firehose: Create Stream
+
+> aws --endpoint-url=http://localhost:4566 firehose **create-delivery-stream** ...
+
+ - Service: `firehose`
+ - Action: `create-delivery-stream`
+
+---
+
+# Localstack - Firehose: Create Stream
+
+> aws --endpoint-url=http://localhost:4566 firehose create-delivery-stream **--delivery-stream-name firehose_es_local_stream** ...
+
+ - Service: `firehose`
+ - Action: `create-delivery-stream`
+ - Options:
+    - `--delivery-stream-name` ⇒ `firehose_es_local_stream`
+
+---
+
+# Localstack - Firehose: Create Stream
+
+> aws --endpoint-url=http://localhost:4566 firehose create-delivery-stream --delivery-stream-name firehose_es_local_stream **--delivery-stream-type DirectPut** ...
+
+ - Service: `firehose`
+ - Action: `create-delivery-stream`
+ - Options:
+    - `--delivery-stream-name` ⇒ `firehose_es_local_stream`
+    - `--delivery-stream-type` ⇒ `DirectPut`
+
+---
+
+# Localstack - Firehose: Create Stream
+
+> aws --endpoint-url=http://localhost:4566 firehose create-delivery-stream --delivery-stream-name firehose_es_local_stream --delivery-stream-type DirectPut **--elasticsearch-destination-configuration "RoleARN=arn:aws:iam::000000000000:role/Firehose-Reader-Role,DomainARN=_<ARN>_,IndexName=test,ProcessingConfiguration={Enabled=false}"**
+
+---
+
+# Localstack - Firehose: Create Stream
+
+ - `RoleARN` ⇒ `arn:aws:iam::000000000000:role/Firehose-Reader-Role`
+ - `DomainARN` ⇒ z.B. für localstack `arn:aws:es:us-east-1:000000000000:domain/es_local`
+    - Alternativ: `ClusterEndpoint` mit der **Host**-URL (mit Port)
+ - `IndexName` ⇒ `test`
+ - `ProcessingConfiguration`:
+    - `Enabled` ⇒ `false`
+
+---
+
+# Localstack - Firehose: Put-Record
+
+---
+
+# Localstack - Firehose: Put-Record
+
+> aws --endpoint-url=http://localhost:4566 **firehose** ...
+
+ - Service: `firehose`
+
+---
+
+# Localstack - Firehose: Put-Record
+
+> aws --endpoint-url=http://localhost:4566 firehose **put-record** ...
+
+ - Service: `firehose`
+ - Action: `put-record`
+
+---
+
+# Localstack - Firehose: Put-Record
+
+> aws --endpoint-url=http://localhost:4566 firehose put-record **--delivery-stream-name firehose_es_local_stream** ...
+
+ - Service: `firehose`
+ - Action: `put-record`
+ - Options:
+    - `--delivery-stream-name` ⇒ `firehose_es_local_stream`
+
+---
+
+# Localstack - Firehose: Put-Record
+
+> aws --endpoint-url=http://localhost:4566 firehose put-record --delivery-stream-name firehose_es_local_stream **--record '{"Data":"eyAidGFyZ2V0IjogImJlcnJ5IiB9"}**'
+
+ - Service: `firehose`
+ - Action: `put-record`
+ - Options:
+    - `--delivery-stream-name` ⇒ `firehose_es_local_stream`
+    - `--record` ⇒ `{"Data":"eyAidGFyZ2V0IjogImJlcnJ5IiB9"}`
+---
+
+# Localstack - Firehose: Put-Record
+
+```json
+{ "Data": Blob }
+```
+
+**Blob**: `eyAidGFyZ2V0IjogImJlcnJ5IiB9`
+
+```json
+{ "target": "berry" }
+```
+
+_base64_ encoded
+
+---
+
+# Fragen? Kurze Pause?
+
+Als nächstes: **Localstack - Externe Services**
+Danach: **Ende**
+
+---
+
+# Localstack - Externe Services
 
 ---
 
@@ -812,301 +1109,60 @@ Quelle: [localstack](https://github.com/localstack/localstack)
 
 # Localstack - Externe Services
 
+- `Elasticsearch`: Docker
 - `DynamoDB`
   - https://github.com/mhart/dynalite
   - https://hub.docker.com/r/amazon/dynamodb-local/
 - `Kinesis`
   - https://github.com/mhart/kinesalite
-- `Firehose`
-  - https://kafka.apache.org/
 - `SQS`
   - https://github.com/softwaremill/elasticmq
-- `Elasticsearch`: Docker
 
 ---
 
-# Fragen? Kurze Pause?
+# Localstack - Externe Services: Elasticsearch
 
-Als nächstes: **Localstack - aws-cli / Beispiel**
+ - `ELASTICSEARCH_BACKEND`
+ - `ELASTICSEARCH_PORT`
 
----
-
-# Localstack - aws-cli installieren
-
->$ aws --version
-
->aws-cli/2...
+ ⇒ **innerhalb von Docker**
 
 ---
 
-# Localstack - aws-cli installieren: Linux / WSL
+# Localstack - Externe Services: Elasticsearch
 
- - `curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"`
- - `unzip awscliv2.zip`
- - `sudo ./aws/install`
+```yml
+version: "3.7"
 
----
-
-# Localstack - aws-cli installieren: Windows
-
- - https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-windows.html
-
----
-
-# Localstack - aws-cli installieren: Mac
-
- - https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-mac.html
-
----
-
-# Localstack - aws-cli ausführen
-
-## Service ausführen:
-> aws <service> <action> [options]
-
-## Lokale Ausführung:
-> aws **--endpoint-url=http://localhost:4566** <service> <action> [options]
-
----
-
-# Localstack - Beispiel
-
-[![](https://mermaid.ink/img/eyJjb2RlIjoiZ3JhcGggVERcbiAgQVtFeHRlcm5lIFN5c3RlbWVdLS0-fElucHV0fCBCW0FQSV1cbiAgQi0uLT5DMShGaXJlaG9zZSBTdHJlYW1zKSAmIEMyKEZpcmVob3NlIFN0cmVhbXMpICYgQzMoRmlyZWhvc2UgU3RyZWFtcylcbiAgQzEtLi0-RChFbGFzdGljc2VhcmNoIFNlcnZpY2UpXG4gIEMyLS4tPkRcbiAgQzMtLi0-RFxuXHRcdCIsIm1lcm1haWQiOnsidGhlbWUiOiJkZWZhdWx0In0sInVwZGF0ZUVkaXRvciI6ZmFsc2UsImF1dG9TeW5jIjp0cnVlLCJ1cGRhdGVEaWFncmFtIjpmYWxzZX0)](https://mermaid-js.github.io/mermaid-live-editor/edit##eyJjb2RlIjoiZ3JhcGggTFJcbiAgQVtFeHRlcm5lIFN5c3RlbWVdLS0-fElucHV0fCBCW0FQSV1cbiAgQi0uLT5DMShGaXJlaG9zZSBTdHJlYW1zKSAmIEMyKEZpcmVob3NlIFN0cmVhbXMpICYgQzMoRmlyZWhvc2UgU3RyZWFtcylcbiAgQzEtLi0-RChFbGFzdGljc2VhcmNoIFNlcnZpY2UpXG4gIEMyLS4tPkRcbiAgQzMtLi0-RFxuXHRcdCIsIm1lcm1haWQiOiJ7XG4gIFwidGhlbWVcIjogXCJkZWZhdWx0XCJcbn0iLCJ1cGRhdGVFZGl0b3IiOmZhbHNlLCJhdXRvU3luYyI6dHJ1ZSwidXBkYXRlRGlhZ3JhbSI6ZmFsc2V9)
-
----
-
-# Localstack - Beispiel
-
-```sh
-docker-compose -f localstack/docker-compose.yml up -d
+services:
+  localstack:
+    container_name: localstack_main
+    image: localstack/localstack:latest
+    ports:
+      - 4566:4566"
+    environment:
+      - DEBUG=1
+      - DATA_DIR=.localstack/data
+      - SERVICES=es,firehose
+      - ELASTICSEARCH_BACKEND=http://es_in_docker
+      - ELASTICSEARCH_PORT=9200
+    volumes:
+      - ".localstack:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
 ```
 
-![](GitHub-Mark-32px.png) [Dgame/localstack-playground](https://github.com/Dgame/localstack-playground)
-
 ---
 
-# Localstack - aws-cli: Elasticsearch Service
+# Localstack - Externe Services: Elasticsearch
 
 > aws --endpoint-url=http://localhost:4566 es create-elasticsearch-domain --domain-name es_local
 
- - Service: `es`
- - Action: `create-elasticsearch-domain`
- - Options:
-    - `--domain-name` ⇒ `es_local`
+ ⇒ **immer noch nötig**, damit localstack sich mit dem externen Service verbindet!
 
 ---
 
-# Localstack - aws-cli: Elasticsearch Service
-
-## Relevant für Production:
- - `--elasticsearch-version <value>`
- - `--elasticsearch-cluster-config <value>`
-
-[aws-cli Dokumentation](https://docs.aws.amazon.com/cli/latest/reference/es/create-elasticsearch-domain.html)
-
----
-
-# Localstack - aws-cli: Elasticsearch Service: --elasticsearch-version
-
- - 7.10, 7.9, 7.8, 7.7, 7.4, 7.1
- - 6.8, 6.7, 6.5, 6.4, 6.3, 6.2, 6.0
- - 5.6, 5.5, 5.3, 5.1
- - 2.3
- - 1.5
-
-[Dokumentation](https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/what-is-amazon-elasticsearch-service.html#aes-choosing-version)
-
----
-
-# Localstack - aws-cli: Elasticsearch Service: --elasticsearch-cluster-config
-
- - `InstanceType` ⇒ `m3.medium.elasticsearch`
- - `InstanceCount`
- - `DedicatedMasterEnabled`
- - `DedicatedMasterType` ⇒ `m3.large.elasticsearch`
- - `DedicatedMasterCount`
-
----
-
-# Localstack - aws-cli: Elasticsearch Service: --elasticsearch-cluster-config
-
-Relevant für Production aber irrelevant für local(stack):
- - In `localstack` wird Elasticsearch Service durch ein internes Elasticsearch Cluster mit einem Node abgebildet
-    - ⇒ [Localstack - Externe Services](#localstack---externe-services)
-
----
-
-# Localstack - aws-cli: Elasticsearch: ARN
-
- - Response der `create-elasticsearch-domain` Action
- - `aws es describe-elasticsearch-domain ---domain-name es_local`
-
-Output:
-```json
-{
-  ...
-  "ARN": arn:aws:es:us-east-1:000000000000:domain/es_local`,
-  ...
-}
-```
-
----
-
-# Localstack - Firehose
-
-> aws --endpoint-url=http://localhost:4566 **firehose** create-delivery-stream --delivery-stream-name firehose_es_local_stream --delivery-stream-type DirectPut --elasticsearch-destination-configuration "RoleARN=arn:aws:iam::000000000000:role/Firehose-Reader-Role,DomainARN=_<ARN>_,IndexName=test,ProcessingConfiguration={Enabled=false}"
-
- - Service: `firehose`
-
----
-
-# Localstack - Firehose
-
-> aws --endpoint-url=http://localhost:4566 firehose **create-delivery-stream** --delivery-stream-name firehose_es_local_stream --delivery-stream-type DirectPut --elasticsearch-destination-configuration "RoleARN=arn:aws:iam::000000000000:role/Firehose-Reader-Role,DomainARN=_<ARN>_,IndexName=test,ProcessingConfiguration={Enabled=false}"
-
- - Service: `firehose`
- - Action: `create-delivery-stream`
-
----
-
-# Localstack - Firehose
-
-> aws --endpoint-url=http://localhost:4566 firehose create-delivery-stream **--delivery-stream-name firehose_es_local_stream** --delivery-stream-type DirectPut --elasticsearch-destination-configuration "RoleARN=arn:aws:iam::000000000000:role/Firehose-Reader-Role,DomainARN=_<ARN>_,IndexName=test,ProcessingConfiguration={Enabled=false}"
-
- - Service: `firehose`
- - Action: `create-delivery-stream`
- - Options:
-    - `--delivery-stream-name` ⇒ `firehose_es_local_stream`
-
----
-
-# Localstack - Firehose
-
-> aws --endpoint-url=http://localhost:4566 firehose create-delivery-stream --delivery-stream-name firehose_es_local_stream **--delivery-stream-type DirectPut** --elasticsearch-destination-configuration "RoleARN=arn:aws:iam::000000000000:role/Firehose-Reader-Role,DomainARN=_<ARN>_,IndexName=test,ProcessingConfiguration={Enabled=false}"
-
- - Service: `firehose`
- - Action: `create-delivery-stream`
- - Options:
-    - `--delivery-stream-name` ⇒ `firehose_es_local_stream`
-    - `--delivery-stream-type` ⇒ `DirectPut`
-
----
-
-# Localstack - Firehose
-
-> aws --endpoint-url=http://localhost:4566 firehose create-delivery-stream --delivery-stream-name firehose_es_local_stream --delivery-stream-type DirectPut **--elasticsearch-destination-configuration "RoleARN=arn:aws:iam::000000000000:role/Firehose-Reader-Role,DomainARN=_<ARN>_,IndexName=test,ProcessingConfiguration={Enabled=false}"**
-
----
-
-# Localstack - Firehose
-
- - `RoleARN` ⇒ `arn:aws:iam::000000000000:role/Firehose-Reader-Role`
- - `DomainARN` ⇒ z.B. für localstack `arn:aws:es:us-east-1:000000000000:domain/es_local`
-    - Alternativ: `ClusterEndpoint` mit der **Host**-URL (mit Port)
- - `IndexName` ⇒ `test`
- - `ProcessingConfiguration`:
-    - `Enabled` ⇒ `false`
-
----
-
-# Localstack - Firehose
-
-> aws --endpoint-url=http://localhost:4566 **firehose** put-record --delivery-stream-name firehose_es_local_stream --record '{"Data":"eyAidGFyZ2V0IjogImJlcnJ5IiB9"}'
-
- - Service: `firehose`
-
----
-
-# Localstack - Firehose
-
-> aws --endpoint-url=http://localhost:4566 firehose **put-record** --delivery-stream-name firehose_es_local_stream --record '{"Data":"eyAidGFyZ2V0IjogImJlcnJ5IiB9"}'
-
- - Service: `firehose`
- - Action: `put-record`
-
----
-
-# Localstack - Firehose
-
-> aws --endpoint-url=http://localhost:4566 firehose put-record **--delivery-stream-name firehose_es_local_stream** --record '{"Data":"eyAidGFyZ2V0IjogImJlcnJ5IiB9"}'
-
- - Service: `firehose`
- - Action: `put-record`
- - Options:
-    - `--delivery-stream-name` ⇒ `firehose_es_local_stream`
-
----
-
-# Localstack - Firehose
-
-> aws --endpoint-url=http://localhost:4566 firehose put-record --delivery-stream-name firehose_es_local_stream **--record '{"Data":"eyAidGFyZ2V0IjogImJlcnJ5IiB9"}**'
-
- - Service: `firehose`
- - Action: `put-record`
- - Options:
-    - `--delivery-stream-name` ⇒ `firehose_es_local_stream`
-    - `--record` ⇒ `{"Data":"eyAidGFyZ2V0IjogImJlcnJ5IiB9"}`
----
-
-# Localstack - Firehose: record
-
-```json
-{ "Data": Blob }
-```
-
-**Blob**: `eyAidGFyZ2V0IjogImJlcnJ5IiB9`
-
-```json
-{ "target": "berry" }
-```
-
-_base64_ encoded
-
----
-
-# Fragen? Kurze Pause?
-
-Als nächstes: **Exkurs 1 - 3**
-Danach: **Ende**
-
----
-
-# Exkurs #1
-
-Erstelle mit _docker_/_docker-compose_ einen PHP Service, der eine PHP Datei einliest mit dem folgenden Inhalt:
-
-```php
-<?php
-
-phpinfo();
-```
-Als **PHP Version** soll **7.4** verwendet werden.
- - Unter http://localhost:8080 soll die _phpinfo_ ausgegeben werden.
- - Änderungen an der Datei auf dem Host sollen im Container ohne Neustart sichtbar sein (Stichwort _Volumes_).
-
-**Tipp**: Verwende den builtin php Server (`php -S ...`)
-**Zeit**: 30 - 60 Minuten
-
----
-
-# Exkurs #2
-
-Erweitere das Ergebnis aus _Exkurs #1_ insofern, dass anstatt des builtin php Servers _php-fpm_ verwendet wird.
-
-**Zeit**: 2 Stunden
-
----
-
-# Exkurs #3
-
-Erstelle einen PHP sowie einen MySQL Service per _docker_/_docker-compose_.  Als **PHP Version** soll **7.4** verwendet werden.
-
- - Änderungen an der Datei auf dem Host sollen im Container ohne Neustart sichtbar sein (Stichwort _Volumes_)
- -  _composer_ steht als Befehl im Container zur Verfügung
- - Der PHP-Service soll bei jedem Aufruf einen neuen (random) Eintrag in eine Tabelle in der MySQL aufnehmen und die ersten 5 Ergebnisse ausgeben.
-
-**Zeit**: 2 - 4 Stunden
-
----
-
-# Fragen?
+# That's it Folks
+## Fragen?
+
+## Folien
+![](GitHub-Mark-32px.png) [Dgame/docker-tutorial](https://github.com/Dgame/docker-tutorial)
