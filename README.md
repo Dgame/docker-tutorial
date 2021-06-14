@@ -121,7 +121,7 @@ Syntax: `image: <what>[:<version>[-<how>[-<kind>]]]`
 - `image: ubuntu`
 - `image: ubuntu:latest`
 - `image: ubuntu:20.04`
-- `image: Dgame/php-custom`
+- `image: GithubUser/php-custom`
 
 ---
 
@@ -1163,6 +1163,3 @@ services:
 
 # That's it Folks
 ## Fragen?
-
-## Folien
-![](GitHub-Mark-32px.png) [Dgame/docker-tutorial](https://github.com/Dgame/docker-tutorial)
