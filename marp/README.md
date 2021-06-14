@@ -56,7 +56,7 @@ Eine Textdatei, die mit verschiedenen Befehlen ein _Image_ beschreibt. Diese wer
 
 ---
 
-# Fragen? Kurze Pause?
+# Fragen?
 
 Als nächstes: **docker-compose**
 
@@ -135,8 +135,8 @@ services:
     image: php:8.1
 ```
 
-Format: `<service-name>_<image-name>_<service-nummer>`
-Hier also `php_php_1`
+Format: `<folder-name>_<service-name>_<service-index>`
+Angenommen, dass `docker-compose.yml` im Ordner "test" liegt: `test_php_1`
 
 ---
 
@@ -198,7 +198,7 @@ ports:
 
  - `target`: Container Port
  - `published`: Host Port
- - `protocol`: Port Protokol (`tcp` oder `udp`)
+ - `protocol`: Port Protokoll (`tcp` oder `udp`)
  - `mode`: _host_ für einen Host-Port oder _ingress_ für einen Port im Schwarmmodus für's Load-Balancing
 
 ```yml
@@ -245,7 +245,7 @@ services:
 ## Restart
 
  - `restart: "no"`: Default. Container wird unter keinen Umständen neugestartet
- - `restart: always`: Wann immer der Container beendet wird (z.B. durch einen Fehler oder weile eine Verbindung abbricht)
+ - `restart: always`: Wann immer der Container beendet wird (z.B. durch einen Fehler oder weil eine Verbindung abbricht)
  - `restart: on-failure`: Nur wenn der Container durch einen Fehler beendet wurde
  - `restart: unless-stopped`: Solange bis der Container erfolgreich beendet wird (z.B. manuell)
 
@@ -464,7 +464,7 @@ services:
       args:
         USER_ID: $USER_ID
     volumes:
-      - .:/var/www/html/:delegated
+      - .:/var/www/html/
 ```
 
 ---
