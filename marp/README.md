@@ -809,7 +809,7 @@ services:
     container_name: localstack_main
     image: localstack/localstack:latest
     ports:
-      - 4566:4566"
+      - "4566:4566"
     environment:
       - DEBUG=1
       - DATA_DIR=.localstack/data
@@ -960,7 +960,7 @@ docker-compose -f localstack/docker-compose.yml up -d
 # aws-cli: ARN
 
  - Response der `create-elasticsearch-domain` Action
- - `aws es describe-elasticsearch-domain ---domain-name es_local`
+ - `aws es describe-elasticsearch-domain --domain-name es_local`
 
 **Output**:
 ```json
@@ -1166,7 +1166,7 @@ services:
     container_name: localstack_main
     image: localstack/localstack:latest
     ports:
-      - 4566:4566"
+      - "4566:4566"
     environment:
       - DEBUG=1
       - DATA_DIR=.localstack/data
