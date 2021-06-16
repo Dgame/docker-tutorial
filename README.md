@@ -2,6 +2,17 @@
 marp: true
 ---
 
+# Roadmap
+
+ - Docker: Kurzer Überblick
+ - docker-compose
+ - Dockerfile
+ - Localstack: Überblick
+ - aws-cli: Grundlagen
+ - Localstack: Beispiel
+
+---
+
 # Docker
 
 ![Docker Virtualisierung](Docker-linux-interfaces.svg.png)
@@ -12,7 +23,7 @@ marp: true
 
 # Docker
 
-Docker dient zur Isolierung von Anwendungen mit Hilfe von sogenannter _Containervirtualisierung_. _Containervirtualisierung_ ist eine Methode um mehrere Instanzen eines Betriebssystems isoliert voneinander den Kernel eines Hostsystems nutzen zu lassen. Im Gegensatz zur Virtualisierung mittels eines Hypervisors hat _Containervirtualisierung_ zwar einige Einschränkungen, gilt aber als besonders ressourcenschonend.
+> Docker dient zur Isolierung von Anwendungen mit Hilfe von sogenannter _Containervirtualisierung_. _Containervirtualisierung_ ist eine Methode um mehrere Instanzen eines Betriebssystems isoliert voneinander den Kernel eines Hostsystems nutzen zu lassen. [...]
 
 **Quellen**
 [Wikipedia: Docker](https://de.wikipedia.org/wiki/Docker_(Software))
