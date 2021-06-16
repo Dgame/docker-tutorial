@@ -85,8 +85,8 @@ _docker-compose_ ist ein Werkzeug zur Definition und Ausführung von Multi-Conta
 
 Die Verwendung von _docker-compose_ ist ein dreistufiger Prozess:
 
- 1. Definierung der Anwendung in einem _Dockerfile_
- 2. Anschließend werden in der Datei `docker-compose.yml` die Dienste, aus denen die Applikation besteht (auch _Services_ genannt), definiert
+ 1. **Optional**: Definierung der Anwendung in einem _Dockerfile_
+ 2. Definition der sogenannten _Services_ (aus denen die Applikation besteht) in der Datei `docker-compose.yml`
  3. `docker-compose up` baut (sofern nötig) und startet alle definierten _Services_
 
 **Quelle**
@@ -94,7 +94,7 @@ Die Verwendung von _docker-compose_ ist ein dreistufiger Prozess:
 
 ---
 
-### Minimaler Aufbau
+## Minimaler Aufbau
 
 ```yml
 version: "3.7"
@@ -106,14 +106,14 @@ services:
 
 ---
 
-### Image - Aufbau
+# Image - Aufbau
 
-Syntax: `image: <what>[:<version>[-<how>[-<kind>]]]`
+Syntax: `image: <what>[:<version>][-<how>][-<kind>]`
 
 ---
 
-### Image - Version
-- `image: php`
+# Image - Version
+
 - `image: php:latest` (gleichbedeutend mit `image: php` - `:latest` ist implizit)
 - `image: php:8`
 - `image: php:8.0`
@@ -121,13 +121,14 @@ Syntax: `image: <what>[:<version>[-<how>[-<kind>]]]`
 
 ---
 
-### Image - How & Kind (Tags)
+# Image - How & Kind (Tags)
+
 - `image: php:7.1-fpm` (`<how>` ist hier `fpm`. Alternative wäre z.B. `apache` oder `cli`)
 - `image: php:7.1-fpm-alpine` (`<kind>` ist `alpine`, ein **minimales** OS image. Alternative wären `buster` und `stretch`)
 
 ---
 
-### Image - Other
+# Image - Other
 
 - `image: ubuntu`
 - `image: ubuntu:latest`
@@ -164,16 +165,31 @@ services:
 
 ---
 
-## Ports
+# Ports
 
-### Short Syntax
+```yml
+version: "3.7"
+
+services:
+  php:
+    container_name: php
+    image: php:8.1
+  ports:
+    - "8080:80"
+```
+
+---
+
+# Ports
+
+## Short Syntax
 
  - Beide Ports angeben: `<Host>:<Container>`
  - Nur den Container Port angeben (ein freier Ports auf dem Host wird zufällig ausgewählt): `:<Container>`
  - Host-IP-Adresse und die Ports (default IP ist `0.0.0.0`): `<ip>:<Host>:<Container>`.
 
 ---
-## Ports
+# Ports
 
 **WICHTIG**: Ports immer als String angeben
 
@@ -183,9 +199,9 @@ services:
 
 ---
 
-## Ports
+# Ports
 
-### Short Syntax - Beispiele
+## Short Syntax - Beispiele
 
 ```yml
 ports:
@@ -203,9 +219,9 @@ ports:
 
 ---
 
-## Ports
+# Ports
 
-### Long Syntax
+## Long Syntax
 
  - `target`: Container Port
  - `published`: Host Port
@@ -222,7 +238,7 @@ ports:
 
 ---
 
-## Dependency
+# Dependency
 
 ```yml
 version: "3.7"
@@ -242,7 +258,7 @@ services:
 
 ---
 
-## Dependency
+# Dependency
 
  - `docker-compose up` startet die definierten Services in der Reihenfolge der Abhängigkeiten. Im Beispiel: `db` > `redis` > `php`
  - `docker-compose up <service>` schließt automatisch die Abhängigkeiten von `<service>` ein. Daher **startet** `docker-compose up php` auch `db` und `redis`.
@@ -253,7 +269,7 @@ services:
 
 ---
 
-## Restart
+# Restart
 
  - `restart: "no"`: Default. Container wird unter keinen Umständen neugestartet
  - `restart: always`: Wann immer der Container beendet wird (z.B. durch einen Fehler oder weil eine Verbindung abbricht)
@@ -265,7 +281,7 @@ services:
 
 ---
 
-## Restart - Beispiel
+# Restart - Beispiel
 
 ```yml
 version: "3.7"
@@ -281,7 +297,7 @@ services:
 
 ---
 
-## Volumes
+# Volumes
 
 Jeder Container geht bei jedem Start von der Image-Definition aus. Container können Dateien erstellen, aktualisieren und löschen, allerdings gehen diese Änderungen verloren, wenn der Container entfernt wird. Um das zu verhindern, benötigen wir _Volumes_.
 
@@ -292,7 +308,7 @@ Volumes bieten die Möglichkeit, bestimmte Dateisystempfade des Containers mit d
 
 ---
 
-## Volumes
+# Volumes
 
 Syntax:
 ```yml
@@ -302,7 +318,7 @@ Syntax:
 
 ---
 
-## Volumes - Beispiel
+# Volumes - Beispiel
 
 ```yml
 version: "3.7"
@@ -317,7 +333,7 @@ services:
 
 ---
 
-## Volumes: Options
+# Volumes: Options
 
 ```yml
 volumes:
@@ -326,7 +342,7 @@ volumes:
 
 ---
 
-## Volumes: Options - consistent
+# Volumes: Options - consistent
 
  - `consistent` (_default_): Wenn sowohl Container als auch Host aktiv und kontinuierlich Änderungen an Daten vornehmen und es sowohl auf dem Host als auch im Container zeitgleich sichtbar sein soll.
 
@@ -334,7 +350,7 @@ Quelle: [Docker Volumes](http://docs.docker.oeynet.com/engine/admin/volumes/bind
 
 ---
 
-## Volumes: Options - cached
+# Volumes: Options - cached
 
  - `cached`: Wenn der Host Änderungen durchführt, befindet sich der Container im _Readyonly_-Modus. Es kann zu Verzögerungen kommen, bevor Aktualisierungen, die auf dem Host vorgenommen werden, innerhalb des Containers sichtbar sind. **Verwenden wenn**: der Host ständig Daten ändert, die der Container liest und verwendet.
 
@@ -347,7 +363,7 @@ Quelle: [Docker Volumes](http://docs.docker.oeynet.com/engine/admin/volumes/bind
 
 ---
 
-## Volumes: Options - delegated
+# Volumes: Options - delegated
 
  - `delegated`: Wenn der Docker-Container Änderungen durchführt, ist der Host im _Readyonly_-Modus. Es kann zu Verzögerungen kommen, bevor Aktualisierungen, die in einem Container vorgenommen werden, auf dem Host sichtbar sind.
 
@@ -361,7 +377,7 @@ Quelle: [Docker Volumes](http://docs.docker.oeynet.com/engine/admin/volumes/bind
 
 ---
 
-## Volumes: Warum `delegated`?
+# Volumes: Warum `delegated`?
 
 >Mac uses osxfs to propagate directories and files shared from macOS to the Linux VM. This propagation makes these directories and files available to Docker containers running on Docker Desktop for Mac. **By default, these shares are fully-consistent, meaning that every time a write happens on the macOS host or through a mount in a container, the changes are flushed to disk so that all participants in the share have a fully-consistent view.
 
@@ -371,7 +387,7 @@ Quelle: [Docker Volumes](http://docs.docker.oeynet.com/engine/admin/volumes/bind
 
 ---
 
-## Volumes: Options - Read-Only
+# Volumes: Options - Read-Only
 
  - `ro`: Der Ordner / die Datei ist im Container nur lesend einsehbar
 
@@ -384,7 +400,7 @@ Quelle: [Docker Volumes](http://docs.docker.oeynet.com/engine/admin/volumes/bind
 
 ---
 
-## Networks
+# Networks
 
 ```yml
 version: "3.7"
@@ -405,14 +421,14 @@ networks:
 ```
 ---
 
-## Networks - Wozu?
+# Networks - Wozu?
 
  - Services im selben `docker-compose.yml` sind implizit über dasselbe, interne Netzwerk verbunden (_default_)
  - Services aus anderen `docker-compose.yml` sind es nicht. Diese können aber, wenn sie im selben Netzwerk (= gleicher Name) sind, miteinander über dieses Netzwerk kommunizieren
 
 ---
 
-## Networks - Driver
+# Networks - Driver
 
  - `bridge`: Default. Wird verwendet, wenn die verschiedenen Anwendungen in eigenständigen Containern laufen, die miteinander kommunizieren müssen.
  - `host`: Für eigenständige Containern. Die Netzwerkisolierung zwischen dem Container und dem Docker-Host wird aufgehoben. Stattdessen wird direkt das Netzwerk des Hosts verwendet.
@@ -424,7 +440,7 @@ Quelle: [Docker Networks](https://docs.docker.com/compose/networking/)
 
 ---
 
-## Networks - external
+# Networks - external
 
 ```yml
 networks:
@@ -461,7 +477,7 @@ Wir möchten die folgenden Pakete installieren:
 
 ---
 
-## Dockerfile - docker-compose
+# Dockerfile - docker-compose
 
 ```yml
 version: "3.7"
@@ -486,7 +502,7 @@ Durch den Verweis `dockerfile: ./.docker/php/Dockerfile` wird als _context_ `./.
 
 ---
 
-## Dockerfile
+# Dockerfile
 
 ```Dockerfile
 FROM php:8.0-fpm-alpine
